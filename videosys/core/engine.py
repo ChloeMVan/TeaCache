@@ -2,6 +2,7 @@ import os
 from functools import partial
 from typing import Any, Optional
 
+import time
 import torch
 import torch.distributed as dist
 
@@ -9,6 +10,12 @@ import videosys
 
 from .mp_utils import ProcessWorkerWrapper, ResultHandler, WorkerMonitor, get_distributed_init_method, get_open_port
 
+def _sync_all():
+    if torch.cuda.is_available():
+        for i in range(torch.cuda.device_count()):
+            torch.cuda.synchronize(i)
+    if dist.is_available() and dist.is_initialized():
+        dist.barrier()
 
 class VideoSysEngine:
     """
@@ -98,7 +105,15 @@ class VideoSysEngine:
         return self.driver_worker.generate(*args, **kwargs)
 
     def generate(self, *args, **kwargs):
-        return self._run_workers("generate", *args, **kwargs)[0]
+        _sync_all()
+        t0 = time.perf_counter()
+        out = self._run_workers("generate", *args, **kwargs)[0]
+        _sync_all()
+        dt = time.perf_counter() - t0
+        # Print only on rank 0 if distributed
+        if (not dist.is_available()) or (not dist.is_initialized()) or dist.get_rank() == 0:
+            print(f"[ENGINE] generate() model-time: {dt:.3f}s")
+        return out
 
     def stop_remote_worker_execution_loop(self) -> None:
         if self.parallel_worker_tasks is None:

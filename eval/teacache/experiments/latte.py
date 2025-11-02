@@ -10,6 +10,18 @@ from videosys.models.transformers.latte_transformer_3d import Transformer3DModel
 from videosys.utils.utils import batch_func
 from functools import partial
 
+# added
+def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCache] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1,delta_rescaled,acc_before,acc_after\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},{row['delta_rescaled']},{row['acc_before']},{row['acc_after']}\n")
+    print(f"[TeaCache] wrote metric log to {path}")
+
 def teacache_forward(
         self,
         hidden_states: torch.Tensor,
@@ -180,11 +192,27 @@ def teacache_forward(
                 coefficients = [-2.46434137e+03,  3.08044764e+02,  8.07447667e+01, -4.11385132e+00, 1.11001402e-01]
                 rescale_func = np.poly1d(coefficients)
                 self.accumulated_rel_l1_distance += rescale_func(((modulated_inp-self.previous_modulated_input).abs().mean() / self.previous_modulated_input.abs().mean()).cpu().item())
+                
                 if self.accumulated_rel_l1_distance < self.rel_l1_thresh:
                     should_calc = False
                 else:
                     should_calc = True
                     self.accumulated_rel_l1_distance = 0
+                # metric calculated here
+
+                step = int(org_timestep[0].item()) if torch.is_tensor(org_timestep) else int(org_timestep[0])
+                acc_before = float(self.accumulated_rel_l1_distance)
+                delta = float(rescale_func(self.accumulated_rel_l1_distance.detach().float().cpu().item()))
+                acc_after = acc_before + delta
+
+                self.__class__.metric_log.append({
+                "timestep": step,
+                "rel_l1": float(self.accumulated_rel_l1_distance.detach().float().cpu().item()),
+                "delta_rescaled": delta,
+                "acc_before": acc_before,
+                "acc_after": acc_after,
+                })
+
             self.previous_modulated_input = modulated_inp        
 
         if self.enable_teacache:
@@ -506,7 +534,10 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.previous_modulated_input = None
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
+    # added 
+    engine.driver_worker.transformer.__class__.metric_log = []
     generate_func(engine, prompt_list, "./samples/latte_teacache_slow", loop=5)
+    dump_teacache_metrics(engine.driver_worker.transformer)
     
 def eval_teacache_fast(prompt_list):
     config = LatteConfig()
@@ -517,14 +548,20 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.previous_modulated_input = None
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
+    # added
+    engine.driver_worker.transformer.__class__.metric_log = []
     generate_func(engine, prompt_list, "./samples/latte_teacache_fast", loop=5)
+    dump_teacache_metrics(engine.driver_worker.transformer)
     
 
 
 def eval_base(prompt_list):
     config = LatteConfig()
     engine = VideoSysEngine(config)
+    # added
+    engine.driver_worker.transformer.__class__.metric_log = []
     generate_func(engine, prompt_list, "./samples/latte_base", loop=5)
+    dump_teacache_metrics(engine.driver_worker.transformer)
 
 
 

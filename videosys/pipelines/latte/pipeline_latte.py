@@ -205,7 +205,7 @@ class LattePipeline(VideoSysPipeline):
 
         # initialize the model if not provided
         if transformer is None:
-            transformer = LatteT2V.from_pretrained(config.model_path, subfolder="transformer", video_length=16).to(
+            transformer = LatteT2V.from_pretrained(config.model_path, subfolder="transformer", video_length=32).to(
                 dtype=dtype
             )
         if vae is None:
@@ -761,7 +761,7 @@ class LattePipeline(VideoSysPipeline):
                 returned where the first element is a list with the generated images
         """
         # 1. Check inputs. Raise error if not correct
-        video_length = 16
+        video_length = 32
         height = 512
         width = 512
         update_steps(num_inference_steps)

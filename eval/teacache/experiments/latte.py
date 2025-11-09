@@ -17,9 +17,9 @@ def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
         print("[TeaCache] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write("timestep,rel_l1,delta_rescaled,acc_before,acc_after\n")
+        f.write("timestep,rel_l1\n")
         for row in log:
-            f.write(f"{row['timestep']},{row['rel_l1']},{row['delta_rescaled']},{row['acc_before']},{row['acc_after']}\n")
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
     print(f"[TeaCache] wrote metric log to {path}")
 
 def teacache_forward(
@@ -193,6 +193,8 @@ def teacache_forward(
                 rescale_func = np.poly1d(coefficients)
                 self.accumulated_rel_l1_distance += rescale_func(((modulated_inp-self.previous_modulated_input).abs().mean() / self.previous_modulated_input.abs().mean()).cpu().item())
                 
+                before_rel_l1_dist = self.accumulated_rel_l1_distance
+
                 if self.accumulated_rel_l1_distance < self.rel_l1_thresh:
                     should_calc = False
                 else:
@@ -200,17 +202,19 @@ def teacache_forward(
                     self.accumulated_rel_l1_distance = 0
                 # metric calculated here
 
+                after_rel_l1_dist = self.accumulated_rel_l1_distance
+
                 step = int(org_timestep[0].item()) if torch.is_tensor(org_timestep) else int(org_timestep[0])
-                acc_before = float(self.accumulated_rel_l1_distance)
-                delta = float(rescale_func(self.accumulated_rel_l1_distance.detach().float().cpu().item()))
-                acc_after = acc_before + delta
+                # acc_before = float(self.accumulated_rel_l1_distance)
+                # delta = float(rescale_func(self.accumulated_rel_l1_distance.detach().float().cpu().item()))
+                # acc_after = acc_before + delta
 
                 self.__class__.metric_log.append({
                 "timestep": step,
-                "rel_l1": float(self.accumulated_rel_l1_distance.detach().float().cpu().item()),
-                "delta_rescaled": delta,
-                "acc_before": acc_before,
-                "acc_after": acc_after,
+                "rel_l1": before_rel_l1_dist,
+                # "delta_rescaled": delta,
+                # "acc_before": acc_before,
+                # "acc_after": acc_after,
                 })
 
             self.previous_modulated_input = modulated_inp        

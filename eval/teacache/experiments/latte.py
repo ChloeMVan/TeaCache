@@ -540,6 +540,7 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     # added 
     engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[LATTE] Starting TeaCache-slow")
     generate_func(engine, prompt_list, "./samples/latte_teacache_slow", loop=5)
     dump_teacache_metrics(engine.driver_worker.transformer)
     
@@ -554,6 +555,7 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     # added
     engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[LATTE] Starting TeaCache-fast")
     generate_func(engine, prompt_list, "./samples/latte_teacache_fast", loop=5)
     dump_teacache_metrics(engine.driver_worker.transformer)
     
@@ -564,6 +566,7 @@ def eval_base(prompt_list):
     engine = VideoSysEngine(config)
     # added
     engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[LATTE] Starting TeaCache-base")
     generate_func(engine, prompt_list, "./samples/latte_base", loop=5)
     dump_teacache_metrics(engine.driver_worker.transformer)
 

@@ -22,6 +22,28 @@ def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
             f.write(f"{row['timestep']},{row['rel_l1']},\n")
     print(f"[TeaCache] wrote metric log to {path}")
 
+def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCache] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+    print(f"[TeaCache] wrote metric log to {path}")
+
+def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCache] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+    print(f"[TeaCache] wrote metric log to {path}")
+
 def teacache_forward(
         self,
         hidden_states: torch.Tensor,
@@ -542,7 +564,7 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.metric_log = []
     print(f"[LATTE] Starting TeaCache-slow")
     generate_func(engine, prompt_list, "./samples/latte_teacache_slow", loop=5)
-    dump_teacache_metrics(engine.driver_worker.transformer)
+    slow_dump_teacache_metrics(engine.driver_worker.transformer)
     
 def eval_teacache_fast(prompt_list):
     config = LatteConfig()
@@ -557,7 +579,7 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.metric_log = []
     print(f"[LATTE] Starting TeaCache-fast")
     generate_func(engine, prompt_list, "./samples/latte_teacache_fast", loop=5)
-    dump_teacache_metrics(engine.driver_worker.transformer)
+    fast_dump_teacache_metrics(engine.driver_worker.transformer)
     
 
 

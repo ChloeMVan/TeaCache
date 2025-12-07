@@ -14,7 +14,7 @@ from functools import partial
 def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCache] no metrics recorded"); return
+        print("[TeaCacheBase] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")
@@ -25,7 +25,7 @@ def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
 def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCache] no metrics recorded"); return
+        print("[TeaCacheSlow] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")
@@ -36,7 +36,7 @@ def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
 def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCache] no metrics recorded"); return
+        print("[TeaCacheFast] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")

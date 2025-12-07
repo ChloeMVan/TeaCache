@@ -162,7 +162,6 @@ coverage.xml
 .testmondata*
 
 pretrained
-samples
 cache_dir
 test_outputs
 datasets

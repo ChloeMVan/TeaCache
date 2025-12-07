@@ -9,6 +9,7 @@ from videosys.core.comm import all_to_all_with_pad, gather_sequence, get_pad, se
 from videosys.models.transformers.latte_transformer_3d import Transformer3DModelOutput
 from videosys.utils.utils import batch_func
 from functools import partial
+from read_custom import read_lines_to_list
 
 # added
 def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
@@ -596,7 +597,8 @@ def eval_base(prompt_list):
 
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
-    prompt_list = ["A person is sword fighting"]
+    # prompt_list = ["A person is sword fighting"]
+    prompt_list = read_lines_to_list("custom_prompts.txt")
     eval_base(prompt_list) 
     eval_teacache_slow(prompt_list)
     eval_teacache_fast(prompt_list)

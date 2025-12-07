@@ -676,7 +676,7 @@ class LattePipeline(VideoSysPipeline):
         self,
         prompt: str = None,
         negative_prompt: str = "",
-        num_inference_steps: int = 100,
+        num_inference_steps: int = 50,
         guidance_scale: float = 7.5,
         seed: int = -1,
         num_images_per_prompt: Optional[int] = 1,

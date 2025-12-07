@@ -6,11 +6,11 @@ import tqdm
 from videosys.utils.utils import set_seed
 
 
-def generate_func(pipeline, prompt_list, output_dir, loop: int = 5, kwargs: dict = {}):
+def generate_func(path, pipeline, prompt_list, output_dir, loop: int = 5, kwargs: dict = {}):
     kwargs["verbose"] = False
     for prompt in tqdm.tqdm(prompt_list):
         for l in range(loop):
-            video = pipeline.generate(prompt, seed=l, **kwargs).video[0]
+            video = pipeline.generate(path, prompt, seed=l, **kwargs).video[0]
             pipeline.save_video(video, os.path.join(output_dir, f"{prompt}-{l}.mp4"))
 
 

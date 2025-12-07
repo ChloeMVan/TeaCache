@@ -104,15 +104,19 @@ class VideoSysEngine:
     def _driver_execute_model(self, *args, **kwargs):
         return self.driver_worker.generate(*args, **kwargs)
 
-    def generate(self, *args, **kwargs):
+    def generate(self, path,  *args, **kwargs):
         _sync_all()
         t0 = time.perf_counter()
         out = self._run_workers("generate", *args, **kwargs)[0]
         _sync_all()
         dt = time.perf_counter() - t0
-        # Print only on rank 0 if distributed
+
+        # Only rank 0 writes, to avoid multi-process contention
         if (not dist.is_available()) or (not dist.is_initialized()) or dist.get_rank() == 0:
-            print(f"[ENGINE] generate() model-time: {dt:.3f}s")
+            # Append a single line per call: timestamp, op name, seconds
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(f"{time.time():.6f},generate,{dt:.6f}\n")
+
         return out
 
     def stop_remote_worker_execution_loop(self) -> None:

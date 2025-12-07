@@ -584,7 +584,7 @@ def eval_teacache_fast(prompt_list):
     
 
 
-def eval_base(prompt_list):
+def eval_base(prompt_list): # this is just plain latte, thats why no logs
     config = LatteConfig()
     engine = VideoSysEngine(config)
     # added

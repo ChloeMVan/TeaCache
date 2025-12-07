@@ -596,7 +596,7 @@ def eval_base(prompt_list):
 
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
-    prompt_list = ["A beautiful sunset in acient Greece."]
+    prompt_list = ["A person is sword fighting"]
     eval_base(prompt_list) 
     eval_teacache_slow(prompt_list)
     eval_teacache_fast(prompt_list)

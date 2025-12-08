@@ -15,35 +15,35 @@ from read_custom import read_lines_to_list
 def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCacheBase] no metrics recorded"); return
+        print("[TeaCacheBaseLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")
         for row in log:
             f.write(f"{row['timestep']},{row['rel_l1']},\n")
-    print(f"[TeaCache] wrote metric log to {path}")
+    print(f"[TeaCacheBaseLatte] wrote metric log to {path}")
 
 def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCacheSlow] no metrics recorded"); return
+        print("[TeaCacheSlowLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")
         for row in log:
             f.write(f"{row['timestep']},{row['rel_l1']},\n")
-    print(f"[TeaCache] wrote metric log to {path}")
+    print(f"[TeaCacheSlowLatte] wrote metric log to {path}")
 
 def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
     if not log: 
-        print("[TeaCacheFast] no metrics recorded"); return
+        print("[TeaCacheFastLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
         f.write("timestep,rel_l1\n")
         for row in log:
             f.write(f"{row['timestep']},{row['rel_l1']},\n")
-    print(f"[TeaCache] wrote metric log to {path}")
+    print(f"[TeaCacheFastLatte] wrote metric log to {path}")
 
 def teacache_forward(
         self,
@@ -234,7 +234,8 @@ def teacache_forward(
 
                 self.__class__.metric_log.append({
                 "timestep": step,
-                "rel_l1": before_rel_l1_dist,
+                "before rel_l1": before_rel_l1_dist,
+                "after rel_l1": after_rel_l1_dist,
                 # "delta_rescaled": delta,
                 # "acc_before": acc_before,
                 # "acc_after": acc_after,

@@ -7,6 +7,40 @@ from videosys.core.comm import all_to_all_with_pad, gather_sequence, get_pad, se
 import numpy as np
 from videosys.utils.utils import batch_func
 from functools import partial
+from read_custom import read_lines_to_list
+
+def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCacheBaseOpenSora] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+    print(f"[TeaCacheBaseOpenSora] wrote metric log to {path}")
+
+def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCacheSlowOpenSora] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+    print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
+
+def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
+    log = getattr(transformer.__class__, "metric_log", None)
+    if not log: 
+        print("[TeaCacheFastOpenSora] no metrics recorded"); return
+    # quick CSV
+    with open(path, "w") as f:
+        f.write("timestep,rel_l1\n")
+        for row in log:
+            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+    print(f"[TeaCacheFastOpenSora] wrote metric log to {path}")
 
 def teacache_forward(
         self, x, timestep, all_timesteps, y, mask=None, x_mask=None, fps=None, height=None, width=None, **kwargs
@@ -70,18 +104,51 @@ def teacache_forward(
                 self.spatial_blocks[0].scale_shift_table[None] + t_mlp.reshape(B, 6, -1)
             ).chunk(6, dim=1)
             modulated_inp = t2i_modulate(self.spatial_blocks[0].norm1(inp), shift_msa, scale_msa)
-            if timestep[0]  == all_timesteps[0] or timestep[0]  == all_timesteps[-1]:
+
+            if timestep[0] == all_timesteps[0] or timestep[0] == all_timesteps[-1]:
                 should_calc = True
                 self.accumulated_rel_l1_distance = 0
-            else:       
-                coefficients = [2.17546007e+02, -1.18329252e+02,  2.68662585e+01, -4.59364272e-02, 4.84426240e-02]
-                rescale_func = np.poly1d(coefficients) 
-                self.accumulated_rel_l1_distance +=  rescale_func(((modulated_inp-self.previous_modulated_input).abs().mean() / self.previous_modulated_input.abs().mean()).cpu().item())
+
+            else:
+                # same coefficients you already had for OpenSora
+                coefficients = [2.17546007e+02, -1.18329252e+02,  2.68662585e+01,
+                                -4.59364272e-02, 4.84426240e-02]
+                rescale_func = np.poly1d(coefficients)
+
+                # raw relative L1
+                rel_l1 = (
+                    (modulated_inp - self.previous_modulated_input).abs().mean()
+                    / self.previous_modulated_input.abs().mean()
+                ).cpu().item()
+
+                # accumulate (rescaled) distance
+                self.accumulated_rel_l1_distance += rescale_func(rel_l1)
+
+                # log BEFORE thresholding/zeroing
+                before_rel_l1_dist = self.accumulated_rel_l1_distance
+
                 if self.accumulated_rel_l1_distance < self.rel_l1_thresh:
                     should_calc = False
                 else:
                     should_calc = True
                     self.accumulated_rel_l1_distance = 0
+
+                # log AFTER thresholding/zeroing
+                after_rel_l1_dist = self.accumulated_rel_l1_distance
+
+                # timestep for logging (mirror Latte’s org_timestep logic)
+                step = int(timestep[0].item()) if torch.is_tensor(timestep) else int(timestep[0])
+
+                # make sure class-level log exists (shared across instances)
+                if not hasattr(self.__class__, "metric_log"):
+                    self.__class__.metric_log = []
+
+                self.__class__.metric_log.append({
+                    "timestep": step,
+                    "before rel_l1": before_rel_l1_dist,
+                    "after rel_l1": after_rel_l1_dist,
+                })
+
             self.previous_modulated_input = modulated_inp
 
         # === blocks ===
@@ -206,7 +273,11 @@ def teacache_forward(
 def eval_base(prompt_list):
     config = OpenSoraConfig()
     engine = VideoSysEngine(config)
-    generate_func(engine, prompt_list, "./samples/opensora_base", loop=5)
+    engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[OPENSORA] Starting TeaCache-slow")
+    generate_func("base_runs.txt", engine, prompt_list, "./samples/opensora_base", loop=1)
+    slow_dump_teacache_metrics(engine.driver_worker.transformer)
+
 
 def eval_teacache_slow(prompt_list):
     config = OpenSoraConfig()
@@ -217,7 +288,10 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.previous_modulated_input = None
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
-    generate_func(engine, prompt_list, "./samples/opensora_teacache_slow", loop=5)
+    engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[OPENSORA] Starting TeaCache-fast")
+    generate_func("slow_runs.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop=1)
+    fast_dump_teacache_metrics(engine.driver_worker.transformer)
 
 def eval_teacache_fast(prompt_list):
     config = OpenSoraConfig()
@@ -228,11 +302,15 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.previous_modulated_input = None
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
-    generate_func(engine, prompt_list, "./samples/opensora_teacache_fast", loop=5)
+    engine.driver_worker.transformer.__class__.metric_log = []
+    print(f"[OPENSORA] Starting TeaCache-base")
+    generate_func("fast_runs.txt", engine, prompt_list, "./samples/opensora_teacache_fast", loop=1)
+    dump_teacache_metrics(engine.driver_worker.transformer)
 
 
 if __name__ == "__main__":
-    prompt_list = read_prompt_list("vbench/VBench_full_info.json")
+    # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
+    prompt_list = read_lines_to_list("custom_prompts.txt")
     eval_base(prompt_list)
     eval_teacache_slow(prompt_list)
     eval_teacache_fast(prompt_list)

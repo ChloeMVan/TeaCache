@@ -18,9 +18,9 @@ def dump_teacache_metrics(transformer, path="./teacache_metrics.csv"):
         print("[TeaCacheBaseLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write("timestep,rel_l1\n")
+        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
-            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
     print(f"[TeaCacheBaseLatte] wrote metric log to {path}")
 
 def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
@@ -29,9 +29,9 @@ def slow_dump_teacache_metrics(transformer, path="./slow_teacache_metrics.csv"):
         print("[TeaCacheSlowLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write("timestep,rel_l1\n")
+        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
-            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
     print(f"[TeaCacheSlowLatte] wrote metric log to {path}")
 
 def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
@@ -40,9 +40,9 @@ def fast_dump_teacache_metrics(transformer, path="./fast_teacache_metrics.csv"):
         print("[TeaCacheFastLatte] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write("timestep,rel_l1\n")
+        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
-            f.write(f"{row['timestep']},{row['rel_l1']},\n")
+            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
     print(f"[TeaCacheFastLatte] wrote metric log to {path}")
 
 def teacache_forward(

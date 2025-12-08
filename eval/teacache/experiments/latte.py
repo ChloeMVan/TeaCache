@@ -598,7 +598,7 @@ def eval_base(prompt_list): # this is just plain latte, thats why no logs
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
     # prompt_list = ["A person is sword fighting"]
-    prompt_list = read_lines_to_list("~/custom_prompts.txt")
+    prompt_list = read_lines_to_list("custom_prompts.txt")
     eval_base(prompt_list) 
     eval_teacache_slow(prompt_list)
     eval_teacache_fast(prompt_list)

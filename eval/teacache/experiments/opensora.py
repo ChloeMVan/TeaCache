@@ -8,6 +8,18 @@ import numpy as np
 from videosys.utils.utils import batch_func
 from functools import partial
 from read_custom import read_lines_to_list
+import os
+import shutil
+
+def empty_directory(directory_path):
+    if os.path.exists(directory_path) and os.path.isdir(directory_path):
+        # Remove the directory and all its contents
+        shutil.rmtree(directory_path)
+        # Recreate an empty directory
+        os.makedirs(directory_path)
+    else:
+        # Create the directory if it doesn't exist
+        os.makedirs(directory_path)
 
 def dump_teacache_metrics(transformer, prompt_list, loop, path="./teacache_metrics.csv", ):
     log = getattr(transformer.__class__, "metric_log", None)
@@ -336,8 +348,14 @@ def eval_teacache_fast(prompt_list):
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
     prompt_list = read_lines_to_list("custom_prompts.txt")
+
     # for p in prompt_list:
+    empty_directory("samples/opensora_base")
     eval_base(prompt_list)
+
+    empty_directory("samples/opensora_teacache_slow")
     eval_teacache_slow(prompt_list)
+
+    # empty_directory("samples/opensora_teacache_fast")
     # eval_teacache_fast(prompt_list)
     

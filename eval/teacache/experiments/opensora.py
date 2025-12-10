@@ -48,10 +48,10 @@ def slow_dump_teacache_metrics(transformer, prompt_list, loop, path="./slow_teac
     with open(path, "w") as f:
         for row in log:
             if start == None or start == row['timestep']:
-                f.writ(f"Prompt: \" {row['prompt']} \" \n")
+                f.write(f"Prompt: \" {row['prompt']} \" \n")
                 f.write("prompt,timestep,before_rel_l1,after_rel_l1\n")
                 start = row['timestep']
-                
+
             f.write(f"{row['timestep']},{row['before rel_l1']},{row['after rel_l1']}\n")
     print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
 

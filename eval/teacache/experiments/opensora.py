@@ -327,7 +327,7 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
-    loop = 1
+    loop = 3
     print(f"[OPENSORA] Starting TeaCache-fast")
     generate_func("fast_teacache_latency.txt", engine, prompt_list, "./samples/opensora_teacache_fast", loop)
     dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)

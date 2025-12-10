@@ -1,15 +1,15 @@
-Prompt: cliff
-Current Time: 1765354449.682, Latency: 33.286304
-Current Time: 1765354483.924, Latency: 33.326614
-Prompt: train railway
-Current Time: 1765354518.174, Latency: 33.349829
-Current Time: 1765354552.375, Latency: 33.351821
-Prompt: mountain
-Current Time: 1765354586.628, Latency: 33.339298
-Current Time: 1765354620.868, Latency: 33.315355
-Prompt: castle
-Current Time: 1765354654.999, Latency: 33.329660
-Current Time: 1765354689.192, Latency: 33.343456
-Prompt: football field
-Current Time: 1765354723.378, Latency: 33.381623
-Current Time: 1765354757.707, Latency: 33.378146
+Prompt: a yellow suitcase
+Current Time: 1765355466.566, Latency: 34.811537
+Current Time: 1765355502.216, Latency: 34.890133
+Prompt: a blue suitcase
+Current Time: 1765355537.814, Latency: 34.933962
+Current Time: 1765355573.452, Latency: 34.926690
+Prompt: a blue car
+Current Time: 1765355609.069, Latency: 34.927402
+Current Time: 1765355644.645, Latency: 34.907776
+Prompt: a green clock
+Current Time: 1765355680.227, Latency: 34.875576
+Current Time: 1765355715.745, Latency: 34.835487
+Prompt: a purple bowl
+Current Time: 1765355751.231, Latency: 34.862288
+Current Time: 1765355785.228, Latency: 33.356005

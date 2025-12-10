@@ -9,39 +9,58 @@ from videosys.utils.utils import batch_func
 from functools import partial
 from read_custom import read_lines_to_list
 
-def dump_teacache_metrics(transformer, prompt, path="./teacache_metrics.csv"):
+def dump_teacache_metrics(transformer, prompt_list, loop, path="./teacache_metrics.csv", ):
     log = getattr(transformer.__class__, "metric_log", None)
+    prompt_list = [x for item in prompt_list for x in [item] * loop]
+    start = None
+    i = 0
     if not log: 
         print("[TeaCacheBaseOpenSora] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write(f"Prompt: \"{prompt}\" \n")
-        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
+            if start == None or row['timestep'] == start:
+                f.write(f"Prompt: \"{prompt_list[i]}\" \n")
+                f.write("timestep, before rel_l1, after rel_l1\n")
+                i += 1
+                start = row['timestep']
             f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
+
     print(f"[TeaCacheBaseOpenSora] wrote metric log to {path}")
 
-def slow_dump_teacache_metrics(transformer, prompt, path="./slow_teacache_metrics.csv"):
+def slow_dump_teacache_metrics(transformer, prompt_list, loop, path="./slow_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
+    prompt_list = [x for item in prompt_list for x in [item] * loop]
+    start = None
+    i = 0
     if not log: 
         print("[TeaCacheSlowOpenSora] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write(f"Prompt: \"{prompt}\" \n")
-        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
+            if start == None or row['timestep'] == start:
+                f.write(f"Prompt: \"{prompt_list[i]}\" \n")
+                f.write("timestep, before rel_l1, after rel_l1\n")
+                i += 1
+                start = row['timestep']
             f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
     print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
 
-def fast_dump_teacache_metrics(transformer, prompt, path="./fast_teacache_metrics.csv"):
+def fast_dump_teacache_metrics(transformer, prompt_list, loop, path="./fast_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
+    prompt_list = [x for item in prompt_list for x in [item] * loop]
+    start = None
+    i = 0
     if not log: 
         print("[TeaCacheFastOpenSora] no metrics recorded"); return
     # quick CSV
     with open(path, "w") as f:
-        f.write(f"Prompt: \"{prompt}\" \n")
-        f.write("timestep, before rel_l1, after rel_l1\n")
         for row in log:
+            if start == None or row['timestep'] == start:
+                f.write(f"Prompt: \"{prompt_list[i]}\" \n")
+                f.write("timestep, before rel_l1, after rel_l1\n")
+                i += 1
+                start = row['timestep']
             f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
     print(f"[TeaCacheFastOpenSora] wrote metric log to {path}")
 
@@ -277,9 +296,10 @@ def eval_base(prompt_list):
     config = OpenSoraConfig()
     engine = VideoSysEngine(config)
     engine.driver_worker.transformer.__class__.metric_log = []
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-base")
-    generate_func("base_latency.txt", engine, prompt_list, "./samples/opensora_base", loop=1)
-    slow_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list)
+    generate_func("base_latency.txt", engine, prompt_list, "./samples/opensora_base", loop)
+    slow_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
 
 
 def eval_teacache_slow(prompt_list):
@@ -292,9 +312,10 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-slow")
-    generate_func("slow_teacache_latency.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop=1)
-    fast_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list)
+    generate_func("slow_teacache_latency.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop)
+    fast_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
 
 def eval_teacache_fast(prompt_list):
     config = OpenSoraConfig()
@@ -306,16 +327,17 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-fast")
-    generate_func("fast_teacache_latency.txt", engine, prompt_list, "./samples/opensora_teacache_fast", loop=1)
-    dump_teacache_metrics(engine.driver_worker.transformer, prompt_list)
+    generate_func("fast_teacache_latency.txt", engine, prompt_list, "./samples/opensora_teacache_fast", loop)
+    dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
 
 
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
     prompt_list = read_lines_to_list("custom_prompts.txt")
-    for p in prompt_list:
-        #eval_base([p])
-        #eval_teacache_slow([p])
-        eval_teacache_fast([p])
+    # for p in prompt_list:
+    #eval_base(prompt_list)
+    #eval_teacache_slow(prompt_list)
+    eval_teacache_fast(prompt_list)
     

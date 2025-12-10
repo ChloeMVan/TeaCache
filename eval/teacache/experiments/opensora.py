@@ -350,8 +350,8 @@ if __name__ == "__main__":
     prompt_list = read_lines_to_list("custom_prompts.txt")
 
     # for p in prompt_list:
-    empty_directory("samples/opensora_base")
-    eval_base(prompt_list)
+    # empty_directory("samples/opensora_base")
+    # eval_base(prompt_list)
 
     empty_directory("samples/opensora_teacache_slow")
     eval_teacache_slow(prompt_list)

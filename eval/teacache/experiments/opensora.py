@@ -33,10 +33,10 @@ def dump_teacache_metrics(transformer, prompt_list, loop, path="./teacache_metri
         for row in log:
             if start == None or row['timestep'] == start:
                 f.write(f"Prompt: \"{prompt_list[i]}\" \n")
-                f.write("timestep, before rel_l1, after rel_l1\n")
+                f.write("timestep, 'rel_l1', before rel_l1, after rel_l1\n")
                 i += 1
                 start = row['timestep']
-            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
+            f.write(f"{row['timestep']},{row['rel_l1']}, {row['before rel_l1']}, {row['before rel_l1']},\n")
 
     print(f"[TeaCacheBaseOpenSora] wrote metric log to {path}")
 
@@ -176,6 +176,7 @@ def teacache_forward(
 
                 self.__class__.metric_log.append({
                     "timestep": step,
+                    "rel_l1": self.accumulated_rel_l1_distance,
                     "before rel_l1": before_rel_l1_dist,
                     "after rel_l1": after_rel_l1_dist,
                     "prompt": getattr(self.__class__, "current_prompt", None),

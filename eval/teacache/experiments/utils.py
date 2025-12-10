@@ -8,8 +8,10 @@ from videosys.utils.utils import set_seed
 
 def generate_func(path, pipeline, prompt_list, output_dir, loop: int = 5, kwargs: dict = {}):
     kwargs["verbose"] = False
+    with open(path, 'w') as f:
+        pass
     for prompt in tqdm.tqdm(prompt_list):
-        
+
         with open(path, "a", encoding="utf-8") as f:
             f.write(f"Prompt: {prompt}\n")
 

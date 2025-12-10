@@ -315,7 +315,7 @@ def eval_teacache_slow(prompt_list):
     loop = 2
     print(f"[OPENSORA] Starting TeaCache-slow")
     generate_func("slow_teacache_latency.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop)
-    fast_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
+    slow_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
 
 def eval_teacache_fast(prompt_list):
     config = OpenSoraConfig()

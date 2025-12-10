@@ -44,16 +44,15 @@ def slow_dump_teacache_metrics(transformer, prompt_list, loop, path="./slow_teac
     log = getattr(transformer.__class__, "metric_log", None)
     if not log:
         print("[TeaCacheSlowOpenSora] no metrics recorded"); return
-
+    start = None
     with open(path, "w") as f:
-        f.write("prompt_idx,prompt,timestep,before_rel_l1,after_rel_l1\n")
         for row in log:
-            f.write(
-                f"{row.get('prompt_idx','')},"
-                f"\"{row.get('prompt','').replace('\"','\\\"')}\","
-                f"{row['timestep']},{row['before rel_l1']},{row['after rel_l1']}\n"
-            )
-
+            if start == None or start == row['timestep']:
+                f.writ(f"Prompt: \" {row['prompt']} \" \n")
+                f.write("prompt,timestep,before_rel_l1,after_rel_l1\n")
+                start = row['timestep']
+                
+            f.write(f"{row['timestep']},{row['before rel_l1']},{row['after rel_l1']}\n")
     print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
 
 def fast_dump_teacache_metrics(transformer, prompt_list, loop, path="./fast_teacache_metrics.csv"):

@@ -347,8 +347,8 @@ def eval_teacache_fast(prompt_list):
 
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
-    # prompt_list = read_lines_to_list("custom_prompts.txt")
-    prompt_list = ["the university of texas at austin on a sunny day"]
+    prompt_list = read_lines_to_list("custom_prompts.txt")
+    # prompt_list = ["the university of texas at austin on a sunny day"]
 
     # for p in prompt_list:
     # empty_directory("samples/opensora_base")

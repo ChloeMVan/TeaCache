@@ -115,7 +115,7 @@ class VideoSysEngine:
         if (not dist.is_available()) or (not dist.is_initialized()) or dist.get_rank() == 0:
             # Append a single line per call: timestamp, op name, seconds
             with open(path, "a", encoding="utf-8") as f:
-                f.write(f"{time.time():.6f},generate,{dt:.6f}\n")
+                f.write(f"Current Time: {time.time():.3f}, Latency: {dt:.6f}\n")
 
         return out
 

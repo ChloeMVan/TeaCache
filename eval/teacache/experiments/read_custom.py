@@ -1,7 +1,7 @@
 import os
 
 def read_lines_to_list(filepath):
-    n = 1
+    n = 3
     i = 0
     lines = []
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))

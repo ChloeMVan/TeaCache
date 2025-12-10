@@ -9,6 +9,10 @@ from videosys.utils.utils import set_seed
 def generate_func(path, pipeline, prompt_list, output_dir, loop: int = 5, kwargs: dict = {}):
     kwargs["verbose"] = False
     for prompt in tqdm.tqdm(prompt_list):
+        
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(f"Prompt: {prompt}\n")
+
         for l in range(loop):
             video = pipeline.generate(path, prompt, seed=l, **kwargs).video[0]
             pipeline.save_video(video, os.path.join(output_dir, f"{prompt}-{l}.mp4"))

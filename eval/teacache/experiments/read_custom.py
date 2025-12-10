@@ -9,7 +9,7 @@ def read_lines_to_list(filepath):
     with open(prompt_path, "r") as f:
         for line in f:
             lines.append(line.rstrip("\n"))  # keep entire line, remove newline only
-            if i == n:
-                break
-            i+=1
+            # if i == n:
+            #     break
+            # i+=1
     return lines

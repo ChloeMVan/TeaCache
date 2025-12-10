@@ -42,20 +42,18 @@ def dump_teacache_metrics(transformer, prompt_list, loop, path="./teacache_metri
 
 def slow_dump_teacache_metrics(transformer, prompt_list, loop, path="./slow_teacache_metrics.csv"):
     log = getattr(transformer.__class__, "metric_log", None)
-    prompt_list = [x for item in prompt_list for x in [item] * loop]
-    start = None
-    i = 0
-    if not log: 
+    if not log:
         print("[TeaCacheSlowOpenSora] no metrics recorded"); return
-    # quick CSV
+
     with open(path, "w") as f:
+        f.write("prompt_idx,prompt,timestep,before_rel_l1,after_rel_l1\n")
         for row in log:
-            if start == None or row['timestep'] == start:
-                f.write(f"Prompt: \"{prompt_list[i]}\" \n")
-                f.write("timestep, before rel_l1, after rel_l1\n")
-                i += 1
-                start = row['timestep']
-            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},\n")
+            f.write(
+                f"{row.get('prompt_idx','')},"
+                f"\"{row.get('prompt','').replace('\"','\\\"')}\","
+                f"{row['timestep']},{row['before rel_l1']},{row['after rel_l1']}\n"
+            )
+
     print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
 
 def fast_dump_teacache_metrics(transformer, prompt_list, loop, path="./fast_teacache_metrics.csv"):
@@ -181,6 +179,7 @@ def teacache_forward(
                     "timestep": step,
                     "before rel_l1": before_rel_l1_dist,
                     "after rel_l1": after_rel_l1_dist,
+                    "prompt": getattr(self.__class__, "current_prompt", None),
                 })
 
             self.previous_modulated_input = modulated_inp
@@ -324,6 +323,7 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
+    engine.driver_worker.transformer.__class__.current_prompt = None
     loop = 2
     print(f"[OPENSORA] Starting TeaCache-slow")
     generate_func("slow_teacache_latency.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop)
@@ -347,7 +347,8 @@ def eval_teacache_fast(prompt_list):
 
 if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
-    prompt_list = read_lines_to_list("custom_prompts.txt")
+    # prompt_list = read_lines_to_list("custom_prompts.txt")
+    prompt_list = ["the university of texas at austin on a sunny day"]
 
     # for p in prompt_list:
     # empty_directory("samples/opensora_base")

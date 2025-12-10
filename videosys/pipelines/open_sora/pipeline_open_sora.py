@@ -138,7 +138,7 @@ class OpenSoraConfig:
         # ======== vae ========
         tiling_size: int = 4,
         # ======== speedup ========
-        enable_flash_attn: bool = False,
+        enable_flash_attn: bool = True,
         # ======== pab ========
         enable_pab: bool = False,
         pab_config: PABConfig = OpenSoraPABConfig(),

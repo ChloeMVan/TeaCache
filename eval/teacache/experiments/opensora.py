@@ -296,7 +296,7 @@ def eval_base(prompt_list):
     config = OpenSoraConfig()
     engine = VideoSysEngine(config)
     engine.driver_worker.transformer.__class__.metric_log = []
-    loop = 5
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-base")
     generate_func("base_latency.txt", engine, prompt_list, "./samples/opensora_base", loop)
     slow_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
@@ -312,7 +312,7 @@ def eval_teacache_slow(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
-    loop = 5
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-slow")
     generate_func("slow_teacache_latency.txt",engine, prompt_list, "./samples/opensora_teacache_slow", loop)
     fast_dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)
@@ -327,7 +327,7 @@ def eval_teacache_fast(prompt_list):
     engine.driver_worker.transformer.__class__.previous_residual = None
     engine.driver_worker.transformer.__class__.forward = teacache_forward
     engine.driver_worker.transformer.__class__.metric_log = []
-    loop = 5
+    loop = 1
     print(f"[OPENSORA] Starting TeaCache-fast")
     generate_func("fast_teacache_latency.txt", engine, prompt_list, "./samples/opensora_teacache_fast", loop)
     dump_teacache_metrics(engine.driver_worker.transformer, prompt_list, loop)

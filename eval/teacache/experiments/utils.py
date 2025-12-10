@@ -14,7 +14,7 @@ def generate_func(path, pipeline, prompt_list, output_dir, loop: int = 5, kwargs
 
         with open(path, "a", encoding="utf-8") as f:
             f.write(f"Prompt: {prompt}\n")
-        pipeline.driver_worker.transformer.current_prompt = prompt
+        pipeline.driver_worker.transformer.__class__.current_prompt = prompt
 
         for l in range(loop):
             video = pipeline.generate(path, prompt, seed=l, **kwargs).video[0]

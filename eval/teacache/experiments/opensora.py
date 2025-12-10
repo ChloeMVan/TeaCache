@@ -337,7 +337,7 @@ if __name__ == "__main__":
     # prompt_list = read_prompt_list("vbench/VBench_full_info.json")
     prompt_list = read_lines_to_list("custom_prompts.txt")
     # for p in prompt_list:
-    # eval_base(prompt_list)
+    eval_base(prompt_list)
     eval_teacache_slow(prompt_list)
     # eval_teacache_fast(prompt_list)
     

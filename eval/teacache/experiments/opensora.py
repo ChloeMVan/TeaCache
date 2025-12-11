@@ -153,7 +153,8 @@ def teacache_forward(
                 ).cpu().item()
 
                 # accumulate (rescaled) distance
-                self.accumulated_rel_l1_distance += rescale_func(rel_l1)
+                # self.accumulated_rel_l1_distance += rescale_func(rel_l1)
+                self.accumulated_rel_l1_distance += rel_l1
 
                 # log BEFORE thresholding/zeroing
                 before_rel_l1_dist = self.accumulated_rel_l1_distance

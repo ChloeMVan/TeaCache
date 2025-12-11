@@ -109,8 +109,10 @@ def teacache_forward(
                 self.accumulated_rel_l1_distance_even = 0  
             else: 
                 coefficients = [2.71156237e+02, -9.19775607e+01, 2.24437250e+00, 2.08355751e+00, 1.41776330e-01]
-                rescale_func = np.poly1d(coefficients)
-                self.accumulated_rel_l1_distance_even += rescale_func(((modulated_inp-self.previous_modulated_input_even).abs().mean() / self.previous_modulated_input_even.abs().mean()).cpu().item())
+                # rescale_func = np.poly1d(coefficients)
+                # self.accumulated_rel_l1_distance_even += rescale_func(((modulated_inp-self.previous_modulated_input_even).abs().mean() / self.previous_modulated_input_even.abs().mean()).cpu().item())
+                self.accumulated_rel_l1_distance_even += ((modulated_inp-self.previous_modulated_input_even).abs().mean() / self.previous_modulated_input_even.abs().mean()).cpu().item()
+                
                 if self.accumulated_rel_l1_distance_even < self.rel_l1_thresh:
                     should_calc_even = False
                 else:
@@ -128,8 +130,9 @@ def teacache_forward(
                 self.accumulated_rel_l1_distance_odd = 0  
             else: 
                 coefficients = [2.71156237e+02, -9.19775607e+01, 2.24437250e+00, 2.08355751e+00, 1.41776330e-01]
-                rescale_func = np.poly1d(coefficients)
-                self.accumulated_rel_l1_distance_odd += rescale_func(((modulated_inp-self.previous_modulated_input_odd).abs().mean() / self.previous_modulated_input_odd.abs().mean()).cpu().item())
+                #rescale_func = np.poly1d(coefficients)
+                # self.accumulated_rel_l1_distance_odd += rescale_func(((modulated_inp-self.previous_modulated_input_odd).abs().mean() / self.previous_modulated_input_odd.abs().mean()).cpu().item())
+                self.accumulated_rel_l1_distance_odd += ((modulated_inp-self.previous_modulated_input_odd).abs().mean() / self.previous_modulated_input_odd.abs().mean()).cpu().item()
                 if self.accumulated_rel_l1_distance_odd < self.rel_l1_thresh:
                     should_calc_odd = False
                 else:

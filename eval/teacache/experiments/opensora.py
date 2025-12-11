@@ -144,7 +144,7 @@ def teacache_forward(
                 # same coefficients you already had for OpenSora
                 coefficients = [2.17546007e+02, -1.18329252e+02,  2.68662585e+01,
                                 -4.59364272e-02, 4.84426240e-02]
-                rescale_func = np.poly1d(coefficients)
+                # rescale_func = np.poly1d(coefficients)
 
                 # raw relative L1
                 rel_l1 = (

@@ -49,10 +49,10 @@ def slow_dump_teacache_metrics(transformer, prompt_list, loop, path="./slow_teac
         for row in log:
             if start == None or start == row['timestep']:
                 f.write(f"Prompt: \" {row['prompt']} \" \n")
-                f.write("prompt,timestep,before_rel_l1,after_rel_l1\n")
+                f.write("prompt,timestep,'rel_l1', before_rel_l1,after_rel_l1\n")
                 start = row['timestep']
 
-            f.write(f"{row['timestep']},{row['before rel_l1']},{row['after rel_l1']}\n")
+            f.write(f"{row['timestep']},{row['before rel_l1']}, {row['before rel_l1']},{row['after rel_l1']}\n")
     print(f"[TeaCacheSlowOpenSora] wrote metric log to {path}")
 
 def fast_dump_teacache_metrics(transformer, prompt_list, loop, path="./fast_teacache_metrics.csv"):
